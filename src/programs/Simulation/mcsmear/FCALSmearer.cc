@@ -217,7 +217,8 @@ void FCALSmearer::SmearEvent(hddm_s::HDDM *record)
 	 double sigEfloor=fcal_config->FCAL_ENERGY_WIDTH_FLOOR;
 	 double sigEstat=fcal_config->FCAL_PHOT_STAT_COEF;
 	 double Erange = fcal_config->FCAL_ENERGY_RANGE;
-         
+   double adcCounts = 0;     
+    
 	 if (row<DFCALGeometry::kBlocksTall&&column<DFCALGeometry::kBlocksWide){
 	   // correct simulation efficiencies 
 	   if (config->APPLY_EFFICIENCY_CORRECTIONS
@@ -246,6 +247,7 @@ void FCALSmearer::SmearEvent(hddm_s::HDDM *record)
 	   }
 	   // Apply constant scale factor to MC energy. 06/22/2016 A. Subedi
 	   E *= fcal_config->FCAL_MC_ESCALE;
+     adcCounts += E/(FCAL_gain*integral_peak*MeV_FADC); 
 	 }
 	 else { // deal with insert
 	   sigEfloor=fcal_config->INSERT_ENERGY_WIDTH_FLOOR;
@@ -256,8 +258,10 @@ void FCALSmearer::SmearEvent(hddm_s::HDDM *record)
 
          if(config->SMEAR_HITS) {
 	   // Smear the timing and energy of the hit
-	   t += gDRandom.SampleGaussian(fcal_config->FCAL_TSIGMA);
-	   
+	   TSigma = 5550./pow(adcCounts,0.5) + 4.2722e+07*pow(adcCounts,-4.32) + 14.0;
+     //t += gDRandom.SampleGaussian(fcal_config->FCAL_TSIGMA);
+	   t += gDRandom.SampleGaussian(TSigma);
+
 	   // Energy width has stochastic and floor terms
 	   double sigma = sqrt( pow(sigEstat,2)/titer->getE() 
 			     + pow(sigEfloor,2));
