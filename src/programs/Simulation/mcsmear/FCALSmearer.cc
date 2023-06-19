@@ -258,7 +258,7 @@ void FCALSmearer::SmearEvent(hddm_s::HDDM *record)
 
          if(config->SMEAR_HITS) {
 	   // Smear the timing and energy of the hit
-	   TSigma = 5550./pow(adcCounts,0.5) + 4.2722e+07*pow(adcCounts,-4.32) + 14.0;
+	   double TSigma = 5550./pow(adcCounts,0.5) + 4.2722e+07*pow(adcCounts,-4.32) + 14.0;
      //t += gDRandom.SampleGaussian(fcal_config->FCAL_TSIGMA);
 	   t += gDRandom.SampleGaussian(TSigma);
 
